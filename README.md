@@ -10,9 +10,7 @@ It is a **decision risk system**.
 
 ## Core Idea
 
-Procurement decisions are not expensive because of tools.
-
-They are expensive because of:
+Procurement decisions are expensive due to:
 
 - missed detail
 - duplicated effort
@@ -22,181 +20,147 @@ They are expensive because of:
 
 Chronozone focuses on:
 
-> Exposing risk before a decision is made.
+> Exposing what requires verification before a decision is made.
 
 ---
 
-## System Model
-
-Chronozone follows a strict model:
+## System Model (1 → 2 → 3)
 
 ### 1. Ingest
-Supplier submissions (documents, policies, certifications, claims)
+Supplier submissions:
+- documents
+- certifications
+- policies
+- specifications
+
+Stored as:
+- `core_files`
+- `core_file_chunks`
+
+---
 
 ### 2. Intelligence
-Extract and structure positions from documents
+Extract positions from submissions and generate **exposures**:
 
-Then generate **Exposures**:
+- **Absence** → missing required evidence  
+- **Misalignment** → claims without operational support  
+- **Contradiction** → inconsistent statements  
+- **Compression** → price below benchmark (requires explanation)
 
-- Absence (missing information)
-- Misalignment (claims without operational support)
-- Contradiction (inconsistent statements)
-- Compression (price vs benchmark pressure)
+---
 
 ### 3. Proof
 Generate structured outputs:
 
-- Supplier Risk Pack
+- Supplier Pack (evidence-linked)
 - Questions for clarification
-- Audit-ready evidence trail
+- Portfolio (bird’s-eye exposure view)
 
 ---
 
 ## Dual View (Critical)
 
-Chronozone has two views:
+### 1) Supplier View
+Supplier submits:
+- price
+- evidence (files)
 
-### 1) Supplier View (Submission)
-
-Supplier uploads:
-
-- documents
-- certifications
-- policies
-- pricing
-
-System records:
-
-- fileIds
-- claims
-- submission state
+Stored in:
+- `proc_bid_suppliers.sharedFileIds`
 
 ---
 
-### 2) Buyer View (Portfolio / Helicopter)
+### 2) Buyer View (Monitor)
 
-This is the core product.
-
-The buyer sees:
-
-- all suppliers in one view
+Buyer sees:
+- all suppliers
 - price vs benchmark
-- exposures per supplier
+- exposure counts
 - open questions
-- a "Needs Verification" queue
+- verification queue
 
-This allows:
-
-> Instant identification of where attention is required.
-
----
-
-## The Helicopter View
-
-The portfolio view is not a dashboard.
-
-It answers one question:
+This answers:
 
 > Where could we be wrong?
 
-Each supplier shows:
+---
 
-- Price
-- Exposure counts
-- Open questions
+## Core API Routes (Implemented)
 
-A global queue surfaces:
+### Bids
+- `GET  /api/proc/bids`
+- `POST /api/proc/bids`
 
-- highest severity exposures
-- across all suppliers
+Collection: `proc_bids`
 
 ---
 
-## Example
+### Portfolio (Birdseye View)
+- `GET /api/proc/bids/:bidId/portfolio`
 
-Supplier A:
-- Price: -10% vs benchmark
-- Missing certification
-- Weak operational evidence
+Returns:
+- suppliers[]
+- priceDeltaPct
+- exposureCounts
+- openQuestions
+- queue[] (highest severity exposures)
 
-→ Potential cost and compliance exposure
-
-Supplier B:
-- Inconsistent ingredient claims
-
-→ Requires clarification before decision
-
----
-
-## Exposure Types
-
-### Absence
-Missing required information
-
-Example:
-- No RSPO certification
-- Missing waste processing details
+Collections:
+- `proc_bids`
+- `proc_bid_suppliers`
+- `proc_signals`
+- `proc_questions`
 
 ---
 
-### Misalignment
-Claims without operational support
+## Required Next Endpoints (Zach)
 
-Example:
-- "Zero landfill" without processor details
+### 1. Supplier invite
+POST /api/proc/bids/:bidId/suppliers
 
----
-
-### Contradiction
-Conflicting statements
-
-Example:
-- "Palm-free" vs "vegetable oil blend"
+Body:
+{
+  supplierOrgId,
+  supplierName
+}
 
 ---
 
-### Compression
-Price significantly below benchmark
+### 2. Supplier submission
+POST /api/proc/bids/:bidId/submit
 
-Example:
-- Supplier is 10% cheaper → potential substitution or scope reduction
-
----
-
-## Key Principle
-
-Chronozone does NOT:
-
-- score suppliers
-- rank suppliers
-- make decisions
-
-It:
-
-> Surfaces what requires verification.
+Body:
+{
+  price,
+  fileIds: string[]
+}
 
 ---
 
-## Outputs
+### 3. Generate pack
+POST /api/proc/bids/:bidId/suppliers/:supplierOrgId/generate
 
-### 1. Portfolio View
-- Supplier list
-- Exposure counts
-- Risk queue
-
-### 2. Supplier Pack
-- Summary
-- Exposures
-- Evidence excerpts
-- Questions
-
-### 3. Questions
-- Generated from exposures
-- Used for clarification
+Process:
+- pull `sharedFileIds`
+- fetch chunks from `core_file_chunks`
+- generate exposures
+- create questions
+- save pack
 
 ---
 
-## Data Model (High Level)
+### 4. Get pack
+GET /api/proc/bids/:bidId/suppliers/:supplierOrgId/pack
+
+Returns:
+- summary
+- exposures
+- evidence excerpts
+- questions
+
+---
+
+## Data Model
 
 Collections:
 
@@ -212,79 +176,109 @@ Key fields:
 - buyerOrgId
 - supplierOrgId
 - sharedFileIds
-- evidenceRefs (fileId, chunkId, excerpt)
+- evidenceRefs: [{ fileId, chunkId?, excerpt? }]
 
 ---
 
-## Integration with Existing Backend
+## Auth (TO REPLACE)
 
-Chronozone assumes:
+Current:
+Header-based stub
 
-### Existing:
-- file ingestion (`core_files`)
-- text chunks (`core_file_chunks`)
-- auth (orgId)
+Headers:
+- x-org-id
+- x-user-id
 
-### New:
-- /api/proc/* endpoints
-- signal engine
-- pack generation
+Zach to replace with:
+- WorkOS
+- NextAuth
+- or existing auth layer
+
+---
+
+## UI (Already Built)
+
+### /monitor
+Group risk view:
+- exposure table
+- verification queue
+- change feed
+
+### /proc/bids/*
+Procurement view
+
+---
+
+## Design Principles
+
+- No scoring
+- No ranking
+- No automated decisions
+
+Everything must be:
+
+- traceable
+- neutral
+- defensible
+
+Language:
+
+- "requires verification"
+- "missing evidence"
+- "inconsistent statements"
 
 ---
 
 ## Why This Matters
 
-Procurement cost is dominated by:
+Procurement cost is not tools.
 
-- time
-- duplication
+It is:
+
+- missed detail
+- duplicated effort
 - wrong decisions
-
-Not tooling.
 
 Chronozone reduces:
 
-- time to review
-- missed detail
-- audit exposure
 - decision risk
+- audit exposure
+- rework cost
 
 ---
 
 ## Positioning
 
-This is not:
+Not:
 
-❌ "RFP automation"
-❌ "AI summarisation"
+❌ RFP tool  
+❌ AI summariser  
 
 This is:
 
-> Decision Risk Infrastructure for document-heavy procurement.
+> Decision Risk Infrastructure for document-heavy procurement
 
 ---
 
-## Next Steps
+## Immediate Goal
 
-1. Implement /api/proc routes
-2. Connect to core_file_chunks
-3. Generate signals from real evidence
-4. Populate portfolio view dynamically
+Hook procurement layer into existing ingestion:
+
+core_files → core_file_chunks → exposures → portfolio
+
+---
+
+## Notes
+
+Voyage / embeddings not required for V1.
+
+Can be added later for:
+- semantic contradiction
+- provenance similarity
+- substitution detection
 
 ---
 
 ## Guiding Principle
 
-Every output must be:
-
-- traceable to evidence
-- neutral in language
-- defensible in audit
-
-No speculation.
-
-No automation of decisions.
-
-Only structured assistance.
-
----
+> Surface what requires verification — do not make the decision.
