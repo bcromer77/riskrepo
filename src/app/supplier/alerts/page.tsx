@@ -1,4 +1,4 @@
-kimport { AppShell } from "@/components/shell/AppShell";
+import { AppShell } from "@/components/shell/AppShell";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { AlertCard } from "@/components/ui/AlertCard";
 

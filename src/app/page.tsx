@@ -1,71 +1,123 @@
 import Link from "next/link";
+import { AppShell } from "@/components/shell/AppShell";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+
+function HomeCard({
+  href,
+  label,
+  title,
+  desc,
+}: {
+  href: string;
+  label: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <Link href={href} className="block">
+      <Card className="hover:shadow-md transition">
+        <div className="p-5">
+          <div className="inline-flex items-center rounded-full bg-[rgb(var(--cz-accent-soft))] px-2.5 py-1 text-xs text-[rgb(var(--cz-accent))] ring-1 ring-emerald-100">
+            {label}
+          </div>
+
+          <div className="mt-3 text-sm font-medium text-zinc-900">{title}</div>
+          <p className="mt-2 text-sm text-zinc-600">{desc}</p>
+
+          <div className="mt-4 text-sm underline text-[rgb(var(--cz-accent))]">
+            Open →
+          </div>
+        </div>
+      </Card>
+    </Link>
+  );
+}
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-black">
-      <div className="max-w-3xl mx-auto px-6 py-24">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Chronozone
-          </h1>
-          <p className="text-sm text-muted-foreground mt-2">
-            Procurement risk — structured, traceable, defensible
-          </p>
-        </div>
-
-        {/* Intro */}
-        <div className="mt-12 space-y-4">
-          <p className="text-base">
-            Chronozone surfaces where supplier submissions may expose cost,
-            compliance, or audit risk.
-          </p>
-
-          <p className="text-base text-muted-foreground">
-            It does not rank suppliers or make decisions. It highlights what
-            requires verification.
-          </p>
-        </div>
-
-        {/* Navigation */}
-        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <AppShell
+      title="Chronozone"
+      subtitle="Procurement risk — structured, traceable, defensible."
+      crumbs={[{ label: "Home" }]}
+      right={
+        <div className="flex items-center gap-3">
           <Link
             href="/monitor"
-            className="block border rounded-xl p-5 hover:bg-muted/30"
+            className="text-sm underline text-[rgb(var(--cz-accent))]"
           >
-            <div className="text-sm font-medium">Monitor</div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Group view of supplier exposures across categories, ingredients,
-              and submissions.
-            </p>
+            Monitor
           </Link>
-
           <Link
-            href="/proc/bids"
-            className="block border rounded-xl p-5 hover:bg-muted/30"
+            href="/supplier/alerts"
+            className="text-sm underline text-[rgb(var(--cz-accent))]"
           >
-            <div className="text-sm font-medium">Bids</div>
-            <p className="text-sm text-muted-foreground mt-2">
-              Procurement events with structured supplier submissions and
-              evidence.
-            </p>
+            Supplier alerts
           </Link>
         </div>
+      }
+    >
+      <div className="space-y-4">
+        <Card>
+          <CardHeader
+            title="What this is"
+            subtitle="A decision risk layer for document-heavy procurement."
+          />
+          <CardBody>
+            <div className="space-y-2 text-sm text-zinc-600">
+              <p>
+                Chronozone surfaces where supplier submissions may expose cost,
+                compliance, or audit risk.
+              </p>
+              <p>
+                It does not rank suppliers or make decisions. It highlights what
+                requires verification.
+              </p>
+              <p className="pt-2">
+                Intelligence lenses (e.g. regulatory readiness such as NIS2 /
+                CBAM / battery passport) are applied <span className="font-medium text-zinc-900">inside Monitor</span> after suppliers submit.
+              </p>
+            </div>
+          </CardBody>
+        </Card>
 
-        {/* Context */}
-        <div className="mt-16 border rounded-xl p-5">
-          <div className="text-sm font-medium">Context</div>
-          <p className="text-sm text-muted-foreground mt-2">
-            Procurement cost is driven by missed detail, duplicated effort, and
-            decisions that cannot be defended.
-          </p>
-
-          <p className="text-sm text-muted-foreground mt-3">
-            Chronozone structures submissions into comparable, evidence-linked
-            outputs — so exposures can be identified before decisions are made.
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <HomeCard
+            href="/monitor"
+            label="Buyer view"
+            title="Monitor"
+            desc="Bird’s-eye exposure map across suppliers, topics, and regulatory readiness."
+          />
+          <HomeCard
+            href="/proc/bids"
+            label="Procurement"
+            title="Bids"
+            desc="Procurement events with supplier submissions, packs, and evidence."
+          />
+          <HomeCard
+            href="/supplier/alerts"
+            label="Supplier view"
+            title="Alerts"
+            desc="Supplier-side action list: clarification requests, missing evidence, due dates."
+          />
         </div>
+
+        <Card>
+          <CardHeader title="Context" subtitle="Where real cost comes from." />
+          <CardBody>
+            <div className="space-y-2 text-sm text-zinc-600">
+              <p>
+                Procurement cost is driven by missed detail, duplicated effort,
+                and decisions that cannot be defended.
+              </p>
+              <p>
+                Chronozone structures submissions into comparable,
+                evidence-linked outputs — so exposures can be identified before
+                decisions are made.
+              </p>
+            </div>
+          </CardBody>
+        </Card>
       </div>
-    </main>
+    </AppShell>
   );
 }

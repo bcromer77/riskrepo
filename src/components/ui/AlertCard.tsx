@@ -1,4 +1,4 @@
-kkimport Link from "next/link";
+import Link from "next/link";
 import { Card } from "./Card";
 
 type Severity = "High" | "Medium" | "Low";
