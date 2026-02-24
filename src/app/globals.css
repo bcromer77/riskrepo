@@ -1,8 +1,22 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Chronozone design tokens */
+:root{
+  --cz-bg: 246 247 248;          /* warm near-white */
+  --cz-card: 255 255 255;        /* card white */
+  --cz-ink: 17 24 39;            /* slate-ish */
+  --cz-muted: 82 82 91;          /* zinc-600 */
+  --cz-ring: 0 0 0 / 0.06;       /* subtle ring */
+  --cz-accent: 16 120 87;        /* emerald-700 */
+  --cz-accent-soft: 236 253 245; /* emerald-50 */
+
+  --cz-danger: 220 38 38;        /* red-600 */
+  --cz-warn: 245 158 11;         /* amber-500 */
+  --cz-info: 2 132 199;          /* sky-600 */
+
+  /* Tailwind theme vars */
+  --background: rgb(var(--cz-bg));
+  --foreground: rgb(var(--cz-ink));
 }
 
 @theme inline {
@@ -12,31 +26,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body{
+  background: rgb(var(--cz-bg));
+  color: rgb(var(--cz-ink));
+  font-family: var(--font-geist-sans), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-:root{
-  --cz-bg: 246 247 248;               /* warm near-white */
-  --cz-card: 255 255 255;             /* white */
-  --cz-ink: 17 24 39;                 /* slate-ish */
-  --cz-muted: 82 82 91;               /* zinc-600 */
-  --cz-ring: 0 0 0 / 0.06;            /* subtle ring */
-  --cz-accent: 16 120 87;             /* emerald-700 */
-  --cz-accent-soft: 236 253 245;      /* emerald-50 */
-}
 /* tasteful default link accent */
-a {
-  text-decoration-color: rgb(var(--cz-accent) / 0.35);
-}
-a:hover{
-  text-decoration-color: rgb(var(--cz-accent) / 0.8);
-}
+a { text-decoration-color: rgb(var(--cz-accent) / 0.35); }
+a:hover { text-decoration-color: rgb(var(--cz-accent) / 0.8); }

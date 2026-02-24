@@ -9,8 +9,10 @@ import { ExposureTable } from "@/components/monitor/ExposureTable";
 import { VerificationQueue } from "@/components/monitor/VerificationQueue";
 import { WhatChanged } from "@/components/monitor/WhatChanged";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { X } from "lucide-react";
 import { DEMO_SUBMISSIONS, Submission } from "@/lib/demoTesco";
 import { parseNLQ } from "@/lib/nlq";
+import { cn } from "@/lib/utils";
 
 type FilterValues = {
   categories: string[];
@@ -36,22 +38,6 @@ function windowSince(win: string | undefined): string | undefined {
   if (win === "Last 90d") return "2025-11-26";
   if (win === "Since Jan 2026") return "2026-01-01";
   return undefined;
-}
-
-function StatPill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 ring-1 ring-black/5 shadow-sm">
-      {children}
-    </span>
-  );
-}
-
-function StatPillDanger({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 ring-1 ring-red-200 shadow-sm">
-      {children}
-    </span>
-  );
 }
 
 export default function MonitorClient() {
@@ -86,10 +72,8 @@ export default function MonitorClient() {
       if (!dateGte(s.updatedAt, parsed.since)) return false;
 
       // UI filter bar constraints
-      // Category – exact
       if (filterValues.categories.length && !filterValues.categories.includes(s.category)) return false;
 
-      // Topic – commodity OR risk theme OR text fallback
       if (filterValues.topics.length) {
         const matchesCommodity = filterValues.topics.includes(s.commodity);
         const matchesTheme = filterValues.topics.some((t) => s.riskThemes.includes(t as any));
@@ -100,13 +84,11 @@ export default function MonitorClient() {
         if (!matchesCommodity && !matchesTheme && !matchesText) return false;
       }
 
-      // Status – derived
       if (filterValues.statuses.length) {
         const st = readinessToStatus(s.readiness);
         if (!filterValues.statuses.includes(st)) return false;
       }
 
-      // Time window – OR logic (any window matches → keep)
       if (filterValues.windows.length) {
         const anyMatches = filterValues.windows.some((w) => dateGte(s.updatedAt, windowSince(w)));
         if (!anyMatches) return false;
@@ -253,20 +235,35 @@ export default function MonitorClient() {
           <div className="flex justify-end">
             <button
               onClick={clearAll}
-              className="text-sm text-zinc-500 hover:text-zinc-900 flex items-center gap-1.5"
+              className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900"
             >
+              <X className="h-3.5 w-3.5" />
               Reset all filters & search
             </button>
           </div>
         )}
 
-        <div className="flex flex-wrap gap-3">
-          <StatPill>
-            {stats.total} items • {stats.suppliers} suppliers
-          </StatPill>
-          {stats.highRisk > 0 && (
-            <StatPillDanger>{stats.highRisk} high-risk alerts</StatPillDanger>
-          )}
+        {/* New live monitor stats header */}
+        <div className="rounded-2xl bg-[rgb(var(--cz-card))] ring-1 ring-black/5 shadow-sm p-4">
+          <div className="flex flex-wrap items-center gap-4 justify-between">
+            <div className="text-sm font-medium">
+              Live monitor
+              <span className="ml-2 text-xs text-[rgb(var(--cz-muted))]">
+                Showing {stats.total} items across {stats.suppliers} suppliers
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {stats.highRisk > 0 && (
+                <span className="inline-flex items-center rounded-full bg-red-50 text-red-700 ring-1 ring-red-200 px-2.5 py-1 text-xs font-medium">
+                  {stats.highRisk} high-risk
+                </span>
+              )}
+              <span className="inline-flex items-center rounded-full bg-[rgb(var(--cz-accent-soft))] text-[rgb(var(--cz-accent))] ring-1 ring-[rgb(var(--cz-accent))]/20 px-2.5 py-1 text-xs font-medium">
+                Assistive only
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
