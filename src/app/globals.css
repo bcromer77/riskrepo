@@ -24,3 +24,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+:root{
+  --cz-bg: 246 247 248;               /* warm near-white */
+  --cz-card: 255 255 255;             /* white */
+  --cz-ink: 17 24 39;                 /* slate-ish */
+  --cz-muted: 82 82 91;               /* zinc-600 */
+  --cz-ring: 0 0 0 / 0.06;            /* subtle ring */
+  --cz-accent: 16 120 87;             /* emerald-700 */
+  --cz-accent-soft: 236 253 245;      /* emerald-50 */
+}
+/* tasteful default link accent */
+a {
+  text-decoration-color: rgb(var(--cz-accent) / 0.35);
+}
+a:hover{
+  text-decoration-color: rgb(var(--cz-accent) / 0.8);
+}

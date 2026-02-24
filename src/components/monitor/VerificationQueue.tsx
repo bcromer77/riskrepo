@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { AlertCard } from "@/components/ui/AlertCard";
 
 type Item = {
   severity: "High" | "Medium" | "Low";
@@ -10,26 +11,22 @@ type Item = {
 
 export function VerificationQueue({ items }: { items: Item[] }) {
   return (
-    <div className="border rounded-xl p-4">
-      <div className="text-sm font-medium">Exposure requiring verification</div>
-      <p className="text-xs text-muted-foreground mt-1">
-        Highest priority items across suppliers.
-      </p>
-
-      <div className="mt-4 space-y-2">
-        {items.map((i, idx) => (
-          <Link
-            key={idx}
-            href={i.href}
-            className="block border rounded-lg p-3 hover:bg-muted/30"
-          >
-            <div className="text-xs text-muted-foreground">
-              {i.severity} · {i.supplierName} · {i.topic}
-            </div>
-            <div className="text-sm mt-1">{i.text}</div>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <Card>
+      <CardHeader title="Exposure requiring verification" subtitle="Highest priority items across suppliers." />
+      <CardBody>
+        <div className="space-y-3">
+          {items.map((i, idx) => (
+            <AlertCard
+              key={idx}
+              severity={i.severity}
+              title={i.text.split("—")[0].trim()}
+              text={i.text}
+              meta={`${i.supplierName} • ${i.topic}`}
+              href={i.href}
+            />
+          ))}
+        </div>
+      </CardBody>
+    </Card>
   );
 }

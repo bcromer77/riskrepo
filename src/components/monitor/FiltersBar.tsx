@@ -1,3 +1,6 @@
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { Field } from "@/components/ui/Field";
+
 type Filters = {
   categories: string[];
   topics: string[];
@@ -5,30 +8,22 @@ type Filters = {
   windows: string[];
 };
 
-export function FiltersBar({ filters }: { filters: Filters }) {
-  return (
-    <div className="border rounded-xl p-4">
-      <div className="text-sm font-medium">Monitor filters</div>
-      <div className="mt-3 grid grid-cols-1 md:grid-cols-4 gap-3">
-        <Filter label="Category" options={filters.categories} />
-        <Filter label="Topic" options={filters.topics} />
-        <Filter label="Status" options={filters.statuses} />
-        <Filter label="Time window" options={filters.windows} />
-      </div>
-      <p className="text-xs text-muted-foreground mt-3">
-        Demo UI: filters are display-only for now.
-      </p>
-    </div>
-  );
+function IconDot() {
+  return <span className="inline-block h-2 w-2 rounded-full bg-[rgb(var(--cz-accent))]" />;
 }
 
-function Filter({ label, options }: { label: string; options: string[] }) {
+export function FiltersBar({ filters }: { filters: Filters }) {
   return (
-    <div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="mt-1 border rounded-lg px-3 py-2 text-sm">
-        {options[0]}
-      </div>
-    </div>
+    <Card>
+      <CardHeader title="Filter submissions" subtitle="Demo UI: filters are display-only for now." />
+      <CardBody>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <Field label="Category" value={filters.categories[0]} leading={<IconDot />} />
+          <Field label="Topic" value={filters.topics[0]} leading={<IconDot />} />
+          <Field label="Status" value={filters.statuses[0]} />
+          <Field label="Time window" value={filters.windows[0]} />
+        </div>
+      </CardBody>
+    </Card>
   );
 }
